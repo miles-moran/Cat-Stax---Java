@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script type="text/javascript">
+        function row(shape, y, z){
+            var x = document.getElementById(shape + "_x").value;
+            var i;
+            for (i = 0; i < x; i++) {
+                var cord = '(' + i + ',' + y + ',' + z + ')';
+                var record = "'" + shape + "', this";
+                var button = '<input type="checkbox" id="' + cord + '" onchange="record(' + record + ')"/>';
+                document.getElementById(shape + "_input").innerHTML += button;
+            }
+        }
+
+        function column(shape, z){
+            var y = document.getElementById(shape + "_y").value;
+            var i;
+            var linebreak = "<br>";
+            for (i = 0; i < y; i++) {
+                row(shape, i, z);
+                document.getElementById(shape + "_input").innerHTML += linebreak;
+            }
+        }
+
+        function slide(shape){
+            document.getElementById(shape + "_input").innerHTML = "";
+            var z = document.getElementById(shape +"_z").value;
+            var i;
+            var linebreak = "<br>";
+            for (i = 0; i < z; i++) {
+                column(shape, i);
+                document.getElementById(shape + "_input").innerHTML += linebreak;
+
+            }
+
+        }
+
+        function record(shape, point){
+            document.getElementById(shape + "_points").value += point.id;
+        }
+
+        var shape_list = [];
+
+        function shapes(){
+            var shape_count =  document.getElementById("shape_count").value;
+            var list_length = shape_list.length;
+            if (list_length < shape_count){
+                for (i = list_length; i < shape_count; i++) {
+                    var shape;
+                    shape_list.push(shape);
+                }
+
+            }
+            displayForms(shape_count);
+        }
+
+        function displayForms(count){
+            document.getElementById("shape_forms").innerHTML = "";
+            for (i = 0; i < count; i++){
+                var form = '<div id=shape_' + i + '>';
+                var shape_title = '<div><h1>Create Shape ' + (i+1) + '</h1></div>';
+                var shape_x = '<div>x: <input id=' + i + "_x" + ' type="number" value="3" onchange="slide(' + i + ')"></div>'
+                var shape_y = '<div>y: <input id=' + i + "_y" + ' type="number" value="3" onchange="slide(' + i + ')"></div>'
+                var shape_z = '<div>z: <input id=' + i + "_z" + ' type="number" value="1" onchange="slide(' + i + ')"></div>'
+                var shape_points = '<div><input type="text" name="' + i + '_points" id="' + i + '_points"></div>';
+                var shape_input = '<div id="' + i + '_input"></div>';
+                form += shape_title + shape_x + shape_y + shape_z + shape_points + shape_input ;
+                form += '</div>';
+                document.getElementById("shape_forms").innerHTML += form;
+                slide(i);
+            }
+        }
+
+     </script>
+</head>
+<body onload="slide('canvas')">
+
+<form action="/" method="POST">
+
+    <div id="canvas_form">
+        <h1>Create a Canvas</h1>
+        <div>x: <input id="canvas_x" type="number" value="3" onchange="slide('canvas')"></div>
+        <div>y: <input id="canvas_y" type="number" value="3" onchange="slide('canvas')"></div>
+        <div>z: <input id="canvas_z" type="number" value="1" onchange="slide('canvas')"></div>
+        <div>s: <input id="shape_count" type="number" value="0" onchange="shapes()"></div>
+        <div><input type="text" name="canvas_points" id="canvas_points"></div>
+        <div id="canvas_input"></div>
+    </div>
+
+    <div id="shape_forms">
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+    <div><input type="submit"></div>
+</form>
+</body>
+</html>
