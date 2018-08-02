@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8"/>
+    <title></title>
+    <link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet"/>
+    <script type="text/javascript">
+        var shape_list = [];
+        var preset_list = [];
+
+        function setCanvas(){
+            var shape_n = 0;
+            var shape_x = 3;
+            var shape_y = 3;
+            var shape_z = 1;
+            var shape_points = [];
+            var active_points = 0;
+            var shape_color = "black";
+
+            var shape = [shape_n, shape_x, shape_y, shape_z, shape_points, active_points, shape_color];
+            shape_list.push(shape);
+            setPresets()
+        }
+        function setPresets(){
+            var shape_n = 0;
+            var shape_x = 2;
+            var shape_y = 2;
+            var shape_z = 1;
+            var shape_points = [];
+            shape_points.push('(0-0-0)');
+            shape_points.push('(1-0-0)');
+            shape_points.push('(1-1-0)');
+            var active_points = 3;
+            var shape_color = "yellow";
+
+            var shape = [shape_n, shape_x, shape_y, shape_z, shape_points, active_points, shape_color];
+            preset_list.push(shape);
+        }
+
+        function shapeChange(shapeCount){
+             var list_length = shape_list.length - 1;
+             var shapeCount = shapeCount;
+
+
+             if (shapeCount > list_length){
+                for (i = list_length; i < shapeCount; i++){
+                    var shape_n = i + 1;
+                    var shape_x = 3;
+                    var shape_y = 3;
+                    var shape_z = 1;
+                    var shape_points = [];
+                    var active_points = 0;
+                    var shape_color = "lime";
+
+                    var shape = [shape_n, shape_x, shape_y, shape_z, shape_points, shape_color];
+                    shape_list.push(shape);
+                }
+             }
+             if (shapeCount < list_length){
+                for (i=shapeCount; i < list_length; i++){
+                    if(i != 0){
+                        shape_list[i][5] = 0;
+                    }
+                }
+             }
+
+            var shape_count = document.getElementById("shape_count").value;
+            if (shape_count == 0 ){
+                document.getElementById("form_0").style.borderBottom = "1px black solid";
+            } else {
+                document.getElementById("form_0").style.borderBottom = "";
+            }
+
+             displayShapes(shapeCount, list_length)
+        }
+
+        function displayShapes(shapeCount, list_length){
+            document.getElementById("shape_forms").innerHTML = "";
+            for (i = 0; i < shapeCount; i++){
+                var j = i + 1;
+                var shape = shape_list[j];
+                var shape_title = '<span class="title"><h2> Create Shape ' + shape[0] + '</h2></span>';
+                var shape_x = '<div class="shape" ><div class="input"><table><tr><td>X-axis</td><td><input id=' + j + "_x" + ' type="number" value="' + shape[1] + '" onchange="slide(' + j + '); trackMass()"></div></td></tr>';
+                var shape_y = '<tr><td>Y-axis</td><td><input id=' + j + "_y" + ' type="number" value="' + shape[2] + '" onchange="slide(' + j + '); trackMass()"></div></td></tr>';
+                var shape_z = '<tr><td>Z-axis</td><td><input id=' + j + "_z" + ' type="number" value="' + shape[3] + '" onchange="slide(' + j + '); trackMass()"></div></td></tr></table></div>';
+                var shape_points = '<input type="hidden" name="' + j + '_points" id="' + j + '_points">';
+                var shape_input = '<div class="points" id="' + j + '_input"></div>';
+                var shape_form = '<div id="shape_' + j + '">';
+                shape_form += shape_title + shape_x + shape_y + shape_z + shape_points + shape_input;
+                shape_form += '</div></div>';
+                document.getElementById("shape_forms").innerHTML += shape_form;
+                slide(j);
+            }
+            document.getElementById("shape_" + shapeCount).style.borderBottom = "1px black solid";
+        }
+
+        function slide(shape){
+            document.getElementById(shape + "_input").innerHTML = "";
+            shape_list[shape][5] = 0;
+            var z = document.getElementById(shape + "_z").value;
+            shape_list[shape][3] = z;
+            var i;
+            var linebreak = '<br>';
+            var slides = '<div class="slides">'
+            for (i = 0; i < z; i++) {
+                var slide = ""
+                slide += column(shape, i);
+                slide = '<div id="slide">' + slide + '</div>';
+                slides += slide;
+            }
+            slides += '</div><div id="d_' + shape + '" class="shape_drop" ondrop="drop(event)" ondragover="allowDrop(event)"></div>'
+            document.getElementById(shape + "_input").innerHTML += slides;
+
+        }
+
+        function column(shape, z){
+            var y = document.getElementById(shape + "_y").value;
+            shape_list[shape][2] = y;
+            var i;
+            var linebreak = "<br>";
+            var column = "";
+            for (i = 0; i < y; i++) {
+                column += row(shape, i, z);
+                column += linebreak;
+            }
+            return column;
+        }
+
+         function row(shape, y, z){
+            var x = document.getElementById(shape + "_x").value;
+            shape_list[shape][1] = x;
+            var row = "";
+            var i;
+            for (i = 0; i < x; i++) {
+               var cord = '[' + shape + ']' + '(' + i + '-' + y + '-' + z + ')';
+               var record = "'" + shape + "', this";
+               var check = false;
+               for (j = 0; j < shape_list[shape][4].length; j++){
+                    if (shape_list[shape][4][j] == cord){
+                        check = true;
+                        break;
+                    }
+               }
+               if (check == true){
+                   var button = '<div class="checkbox"><input type="checkbox" checked id="' + cord + '" onclick="record(' + record + '); trackMass()"/>';
+                   button += '<label for="' + cord + '"></label></div>';
+                   shape_list[shape][5] += 1;
+               } else {
+                   var button = '<div class="checkbox"><input type="checkbox" id="' + cord + '" onclick="record(' + record + '); trackMass()"/>';
+                   button += '<label for="' + cord + '"></label></div>';
+               }
+               row += button;
+            }
+            return row;
+        }
+
+        function record(shape, point){
+            var check = point.checked;
+            if (check == true){
+                shape_list[shape][4].push(point.id);
+                shape_list[shape][5]+= 1;
+            }
+            if (check == false){
+                for (i = 0; i < shape_list[shape][4].length; i++){
+                    if (point == shape_list[shape][4][i]){
+                        shape_list[shape][4].splice(i, 1);
+                        shape_list[shape][5]-= 1;
+                    }
+                }
+            }
+
+            var points = "";
+
+            for (i = 0; i < shape_list[shape][4].length; i++){
+                points += shape_list[shape][4][i];
+            }
+
+            document.getElementById(shape + "_points").value = points;
+        }
+        function trackMass(){}
+
+        function trackMass2(){
+             document.getElementById("header").innerHTML = "";
+             var header = '<span id="header"><h1>Create a Canvas</h1>';
+
+             var shape_count = document.getElementById("shape_count").value;
+             var canvas_points = shape_list[0][5];
+
+             var shape_points = 0;
+             for (i=1; i <= shape_count; i++){
+                shape_points += shape_list[i][5];
+             }
+             var points;
+             if (shape_points > canvas_points){
+                points = shape_points;
+             } else {
+                points = canvas_points;
+             }
+
+             if (points == 0){
+                    header += '<div id="logo"><div class="square" id="L1" style="background:blue"></div>';
+                    //header += '<div class="square" class="top" id="L2" style="background:orange"></div>';
+                    //header += '<div class="square" class="top" id="L3" style="background:orange"></div>';
+                    //header += '<div class="square" id="L4" style="background:orange"></div>';
+
+             }
+
+             for (i=0; i < points; i ++){
+                if ((i < canvas_points) && (i < shape_points))  {
+                    header += '<span class="square" style="background:purple" class="purple"></span>';
+                }
+                if ((i <= canvas_points) && (i >= shape_points)){
+                    header += '<span class="square" style="background:blue" class="blue"></span>';
+                }
+                if ((i >= canvas_points) && (i <= shape_points)){
+                    header += '<span class="square" style="background:red" class="red"></span>';
+                }
+             }
+
+             if (canvas_points == shape_points && (canvas_points != 0)){
+                header += '<input type="submit">';
+             }
+
+             header += '</span>';
+
+             document.getElementById("header").innerHTML = header;
+            }
+
+            function dragStart(event) {
+                event.dataTransfer.setData("Shape", event.target.id);
+            }
+
+            function dragging(event) {
+
+            }
+
+            function allowDrop(event) {
+                event.preventDefault();
+            }
+
+            function drop(event) {
+                event.preventDefault();
+                var data = event.dataTransfer.getData("Shape");
+                event.target.appendChild(document.getElementById(data));
+                debugger
+                applyPreset(event.target.id, data, event);
+            }
+
+            function applyPreset(landing, preset, event){
+                var landing_length = landing.length;
+                var preset_length = preset.length;
+                for(i = 0; i < preset_length; i++){
+                    if(preset[i] == "_"){
+                        var p = preset.slice(i+1, preset_length);
+                    }
+                }
+                for(i = 0; i < landing_length; i++){
+                    if(landing[i] == "_"){
+                        var l = landing.slice(i+1, landing_length);
+                    }
+                }
+                var num = p-1;
+                //var origin = 'preset_' + p + '_container';
+                //var origin_id = document.getElementById(origin)
+                //origin_id.appendChild(data)
+
+
+
+                createPresetPoints(num, l);
+
+
+
+
+            }
+
+            function createPresetPoints(p, l){
+                var new_points = []
+
+                for(i = 0; i < preset_list[p][4].length; i++){
+                    point = preset_list[p][4][i];
+                    var new_point = '[' + l + ']' + point;
+                    new_points.push(new_point);
+                }
+                preset_list[p][4] = new_points;
+                preset_list[p][0] = l;
+                shape_list[l] = preset_list[p];
+                slide(l);
+            }
+    </script>
+    <style>
+        body {
+            font-family: 'Muli', sans-serif;
+        }
+        input[type="number"] {
+            width: 2.5em;
+        }
+        input[type="checkbox"] {
+
+        }
+
+        .purple {
+            background: purple;
+        }
+        .blue {
+            background: blue;
+        }
+        .red {
+            background: red;
+        }
+        h1 {
+            display: inline-block;
+
+        }
+        .square {
+                display: inline-block;
+                width: 1em;
+                height: 1em;
+                margin: 0em;
+                margin-left: 1em;
+
+        }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+
+        opacity: 1;
+        }
+        .points {
+            border-top: 1px black solid;
+            display: grid;
+            grid-template-columns: auto 8em;
+            padding-top: .5em;
+            padding-left: -1.5em;
+
+        }
+
+        .input {
+            border-top: 1px black solid;
+            border-right: 1px black solid;
+        }
+
+        .title {
+            border-top: 1px black solid;
+            width: 100%;
+            display: inline-block;
+         }
+
+        .shape {
+           display: grid;
+           grid-template-areas: "input points";
+           grid-template-columns: 7em auto;
+        }
+        @keyframes blink {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        #L1 {
+            animation: blink 2s;
+            animation-iteration-count: infinite;
+        }
+        .top {
+            margin-left: -1em;
+        }
+        #logo {
+            display: inline-block;
+        }
+        #L2 {
+            position: relative;
+            left: -1em;
+        }
+        #L3 {
+            position: relative;
+            left: -3em;
+            top: -1em;
+        }
+        #L4 {
+            position: relative;
+            left: -6em;
+            top: -1em;
+        }
+        body {
+            line-height: 24px;
+            font-size: 16px;
+        }
+          .checkbox input[type="checkbox"] {
+            opacity: 0;
+        }
+        .checkbox label::before{
+            content: "";
+            display: inline-block;
+
+            height: 16px;
+            width: 16px;
+
+            outline: 1px solid;
+            left: 1.00em;
+        }
+        .checkbox {
+            display: inline-block;
+
+        }
+        .checkbox label::after {
+            content: "";
+            display: inline-block;
+            height: 16px;
+            width: 16px;
+            background-color: lime;
+            position: relative;
+            left: -1.00em;
+            margin-right: -1em;
+        }
+            .checkbox input[type="checkbox"] + label::after {
+            content: none;
+        }
+        .checkbox input[type="checkbox"]:checked + label::after {
+            content: "";
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 79.5em 46em;
+        }
+        #preset {
+            border: 1px black solid;
+            height: 45em;
+            width: 7.85em;
+            position: fixed;
+            left: 87em;
+            background-color: gray;
+        }
+        #header {
+            background-color: lightblue;
+        }
+        #preset_container {
+            border: 1px solid black;
+            margin: 1px;
+            height: 44.8em;
+            width: 7.6em;
+            background-color: white;
+        }
+        #preset_header {
+            margin-left: 3.35em;
+        }
+        .droptarget {
+            float: left;
+            width: 89px;
+            height: 89px;
+            margin: 3px;
+            padding: 10px;
+            border: 1px solid #aaaaaa;
+            margin-top: 5.2px;
+        }
+        #preset_1 {
+            background-image: url("https://i.imgur.com/W75E69m.jpg");
+            background-size: 100% 100%;
+
+            width: 89px;
+            height: 89px;
+        }
+        .shape_drop {
+            position: absolute;
+        }
+        .slides {
+            display: grid;
+            grid-template-columns: auto auto auto auto auto auto auto;
+        }
+        .shape_drop {
+            position: absolute;
+            width: 89px;
+            height: 89px;
+            right: 16.5em;
+
+            border: 1px solid #aaaaaa;
+            margin-top: .65em;
+        }
+        .shape_drop:hover{
+            cursor: pointer;
+        }
+        .droptarget:hover{
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body onload="setCanvas(); slide('0'); trackMass(); shapeChange();">
+
+<form name="form" id="form" action="/test" method="GET" th:object="${PuzzleForm}">
+
+    <div class="grid">
+        <div id="custom_input">
+            <span id="header" class="title"><h1>Create a Canvas</h1></span>
+            <div id="form_0"  class="shape">
+                <div class="input">
+                    <table>
+                        <tr>
+                            <td>X-axis </td>
+                            <td><input id="0_x" type="number" value="3" onchange="slide('0'); trackMass()"></td>
+                        </tr>
+                        <tr>
+                            <td>Y-axis </td>
+                            <td><input id="0_y" type="number" value="3" onchange="slide('0'); trackMass()"></td>
+
+                        </tr>
+                        <tr>
+                            <td>Z-axis </td>
+                            <td><input id="0_z" type="number" value="1" onchange="slide('0'); trackMass()"></td>
+                        </tr>
+                        <tr>
+                            <td>Shapes </td>
+                            <td><input id="shape_count" type="number" value="0" onchange="shapeChange(this.value); trackMass()"></td>
+                        </tr>
+                        <div><input type="hidden" name="0_points" id="0_points"></div>
+                        </table>
+                    </div>
+                <div id="0_input" class="points"></div>
+            </div>
+            <div id="shape_forms"></div>
+        </div>
+        <div id="preset">
+            <div id="preset_container">
+                    <div id="presets">
+                            <div id="preset_1_container" class="droptarget" ondrop="drop(event)" ondragover="allowDrop(event)">
+                                <div id="preset_1" ondragstart="dragStart(event)" ondrag="dragging(event)" draggable="true"></div>
+                            </div>
+                            <div class="droptarget" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                            <div class="droptarget" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                            <div class="droptarget" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                            <div class="droptarget" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                            <div class="droptarget" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                    </div>
+            </div>
+        </div>
+    </div>
+    <input type="submit">
+</form>
+<div id="test"></div>
+</body>
+</html>

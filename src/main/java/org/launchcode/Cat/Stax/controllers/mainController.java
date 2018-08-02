@@ -1,23 +1,32 @@
 package org.launchcode.Cat.Stax.controllers;
 
 
+import org.launchcode.Cat.Stax.technical.PuzzleForm;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class mainController {
 
+
     @RequestMapping(value = "", method = RequestMethod.GET)
     public String index(){
-        return "index";
+        return "ThymeLeaf12";
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public String prepare(Model model, @RequestParam String canvas_points){
-        model.addAttribute("canvas_points", canvas_points);
+    public String processIndex(@ModelAttribute PuzzleForm form,
+                                     Errors errors, Model model) {
         return "test";
     }
+
+
+
+
+
+
 }
