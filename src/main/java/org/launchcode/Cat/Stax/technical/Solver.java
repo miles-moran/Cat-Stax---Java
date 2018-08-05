@@ -10,10 +10,14 @@ public class Solver {
             System.out.println(shape.points);
             sum = sum + shape.points.size();
         }
+        Integer count = canvas.shapes.size();
         String canvas_mass = "Canvas Mass: " + canvas.points.size();
         String shape_mass = "Shape Mass: " + sum;
+        String shape_count = "Shape Count: " + count;
+
         System.out.println(canvas_mass);
         System.out.println(shape_mass);
+        System.out.println(shape_count);
         double p = 1;
         for(Shape shape: canvas.shapes){
             p = p * (shape.permutations().size() * canvas.points.size());
@@ -224,5 +228,90 @@ public class Solver {
         }
         ArrayList<ArrayList<Point>> blank = new ArrayList<>();
         return blank;
+    }
+    public ArrayList<ArrayList<Point>> convertRawString(String rawInput) {
+        String[] rawDivided = rawInput.split("\\D+");
+        ArrayList<ArrayList<Point>> shapes = new ArrayList<>();
+        int counter = 0;
+        Integer index = 0;
+        Integer x = 0;
+        Integer y = 0;
+        Integer z = 0;
+        for(String rawValue: rawDivided){
+            if(isNumeric(rawValue)){
+                if(counter == 0){
+                    index = Integer.parseInt(rawValue);
+                    ArrayList<Point> points = new ArrayList<>();
+                    while(shapes.size() < (index + 1)){
+                        shapes.add(points);
+                    }
+                    counter += 1;
+                } else if(counter == 1){
+                    x = Integer.parseInt(rawValue);
+
+                    counter += 1;
+                } else if(counter == 2){
+                    y = Integer.parseInt(rawValue);
+
+                    counter += 1;
+                } else if(counter == 3){
+                    z = Integer.parseInt(rawValue);
+                    shapes.get(index).add(new Point(x, y, z));
+                    counter = 0;
+                }
+            } else {
+                continue;
+            }
+        }
+        System.out.println(shapes.get(1).toString());
+        return shapes;
+
+    }
+
+
+    public static boolean isNumeric(String string) {
+        if (string == null || string.isEmpty()) {
+            return false;
+        }
+        int i = 0;
+        int stringLength = string.length();
+        if (string.charAt(0) == '-') {
+            if (stringLength > 1) {
+                i++;
+            } else {
+                return false;
+            }
+        }
+        if (!Character.isDigit(string.charAt(i))
+                || !Character.isDigit(string.charAt(stringLength - 1))) {
+            return false;
+        }
+        i++;
+        stringLength--;
+        if (i >= stringLength) {
+            return true;
+        }
+        for (; i < stringLength; i++) {
+            if (!Character.isDigit(string.charAt(i))
+                    && string.charAt(i) != '.') {
+                return false;
+            }
+        }
+        return true;
+    }
+    public ArrayList<Shape> convertPointsToShapes(ArrayList<ArrayList<Point>> points){
+        ArrayList<Shape> shapes = new ArrayList<>();
+        Sorter sorter = new Sorter();
+        for(int i=0; i < points.size(); i++){
+            Shape shape = new Shape(i, sorter.sort(points.get(i)));
+            shapes.add(shape);
+        }
+        return shapes;
+    }
+    public Canvas prepareCanvas(ArrayList<Shape> shapes){
+        Canvas canvas = new Canvas(shapes.get(0).points);
+        shapes.remove(0);
+        canvas.setShapes(shapes);
+        return canvas;
     }
 }

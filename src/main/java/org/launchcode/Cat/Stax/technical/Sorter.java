@@ -2,7 +2,7 @@ package org.launchcode.Cat.Stax.technical;
 
 import java.util.ArrayList;
 
-public class Sorter { //YOU FORGOT ABOUT PERMUTATIONS ON THE Z AXIS. YOU FORGOT HOW TO SORT WHILE INCLUDING THE Z AXIS.
+public class Sorter {
     public Sorter() {
 
     }

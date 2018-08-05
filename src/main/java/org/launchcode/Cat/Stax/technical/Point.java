@@ -67,4 +67,6 @@ public class Point {
     public void setList(ArrayList<Integer> list) {
         this.list = list;
     }
+
+
 }

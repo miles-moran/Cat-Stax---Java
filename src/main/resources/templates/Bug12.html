@@ -14,7 +14,7 @@
             var shape_y = 3;
             var shape_z = 1;
             var shape_points = [];
-            var active_points = 0;
+            var active_points = [];
             var shape_color = "black";
 
             var shape = [shape_n, shape_x, shape_y, shape_z, shape_points, active_points, shape_color];
@@ -30,7 +30,7 @@
             shape_points.push('(0-0-0)');
             shape_points.push('(1-0-0)');
             shape_points.push('(1-1-0)');
-            var active_points = 3;
+            var active_points = shape_points;
             var shape_color = "yellow";
 
             var shape = [shape_n, shape_x, shape_y, shape_z, shape_points, active_points, shape_color];
@@ -41,26 +41,18 @@
              var list_length = shape_list.length - 1;
              var shapeCount = shapeCount;
 
-
              if (shapeCount > list_length){
                 for (i = list_length; i < shapeCount; i++){
-                    var shape_n = i + 1;
+                    var shape_n = i;
                     var shape_x = 3;
                     var shape_y = 3;
                     var shape_z = 1;
                     var shape_points = [];
-                    var active_points = 0;
+                    var active_points = [];
                     var shape_color = "lime";
 
                     var shape = [shape_n, shape_x, shape_y, shape_z, shape_points, shape_color];
                     shape_list.push(shape);
-                }
-             }
-             if (shapeCount < list_length){
-                for (i=shapeCount; i < list_length; i++){
-                    if(i != 0){
-                        shape_list[i][5] = 0;
-                    }
                 }
              }
 
@@ -79,24 +71,28 @@
             for (i = 0; i < shapeCount; i++){
                 var j = i + 1;
                 var shape = shape_list[j];
-                var shape_title = '<span class="title"><h2> Create Shape ' + shape[0] + '</h2></span>';
+                var shape_title = '<span class="title"><h2> Create Shape ' + j + '</h2></span>';
                 var shape_x = '<div class="shape" ><div class="input"><table><tr><td>X-axis</td><td><input id=' + j + "_x" + ' type="number" value="' + shape[1] + '" onchange="slide(' + j + '); trackMass()"></div></td></tr>';
                 var shape_y = '<tr><td>Y-axis</td><td><input id=' + j + "_y" + ' type="number" value="' + shape[2] + '" onchange="slide(' + j + '); trackMass()"></div></td></tr>';
                 var shape_z = '<tr><td>Z-axis</td><td><input id=' + j + "_z" + ' type="number" value="' + shape[3] + '" onchange="slide(' + j + '); trackMass()"></div></td></tr></table></div>';
-                var shape_points = '<input type="hidden" name="' + j + '_points" id="' + j + '_points">';
+                var shape_points = '<input name="' + j + '_points" id="' + j + '_points">';
                 var shape_input = '<div class="points" id="' + j + '_input"></div>';
                 var shape_form = '<div id="shape_' + j + '">';
-                shape_form += shape_title + shape_x + shape_y + shape_z + shape_points + shape_input;
+                shape_form += shape_title + shape_x + shape_y + shape_z + shape_input + shape_points;
                 shape_form += '</div></div>';
                 document.getElementById("shape_forms").innerHTML += shape_form;
-                slide(j);
+
+            }
+            slide(0);
+            for (i = 0; i < shapeCount; i ++){
+                slide(i+1);
             }
             document.getElementById("shape_" + shapeCount).style.borderBottom = "1px black solid";
         }
 
         function slide(shape){
             document.getElementById(shape + "_input").innerHTML = "";
-            shape_list[shape][5] = 0;
+            shape_list[shape][5] = [];
             var z = document.getElementById(shape + "_z").value;
             shape_list[shape][3] = z;
             var i;
@@ -110,6 +106,8 @@
             }
             slides += '</div><div id="d_' + shape + '" class="shape_drop" ondrop="drop(event)" ondragover="allowDrop(event)"></div>'
             document.getElementById(shape + "_input").innerHTML += slides;
+
+            document.getElementById(shape + "_points").value = shape_list[shape][5];
 
         }
 
@@ -144,7 +142,7 @@
                if (check == true){
                    var button = '<div class="checkbox"><input type="checkbox" checked id="' + cord + '" onclick="record(' + record + '); trackMass()"/>';
                    button += '<label for="' + cord + '"></label></div>';
-                   shape_list[shape][5] += 1;
+                   shape_list[shape][5].push(cord);
                } else {
                    var button = '<div class="checkbox"><input type="checkbox" id="' + cord + '" onclick="record(' + record + '); trackMass()"/>';
                    button += '<label for="' + cord + '"></label></div>';
@@ -158,25 +156,24 @@
             var check = point.checked;
             if (check == true){
                 shape_list[shape][4].push(point.id);
-                shape_list[shape][5]+= 1;
+                shape_list[shape][5].push(point.id);
             }
             if (check == false){
                 for (i = 0; i < shape_list[shape][4].length; i++){
-                    if (point == shape_list[shape][4][i]){
+                    if (point.id == shape_list[shape][4][i]){
                         shape_list[shape][4].splice(i, 1);
-                        shape_list[shape][5]-= 1;
+                    }
+                }
+                for (i = 0; i < shape_list[shape][5].length; i++){
+                    if (point.id == shape_list[shape][5][i]){
+                        shape_list[shape][5].splice(i, 1);
                     }
                 }
             }
 
-            var points = "";
-
-            for (i = 0; i < shape_list[shape][4].length; i++){
-                points += shape_list[shape][4][i];
-            }
-
-            document.getElementById(shape + "_points").value = points;
+            document.getElementById(shape + "_points").value = shape_list[shape][5];
         }
+
         function trackMass(){}
 
         function trackMass2(){
@@ -184,17 +181,17 @@
              var header = '<span id="header"><h1>Create a Canvas</h1>';
 
              var shape_count = document.getElementById("shape_count").value;
-             var canvas_points = shape_list[0][5];
+             var shape_points = shape_list[0][5];
 
              var shape_points = 0;
              for (i=1; i <= shape_count; i++){
                 shape_points += shape_list[i][5];
              }
              var points;
-             if (shape_points > canvas_points){
+             if (shape_points > shape_points){
                 points = shape_points;
              } else {
-                points = canvas_points;
+                points = shape_points;
              }
 
              if (points == 0){
@@ -206,18 +203,18 @@
              }
 
              for (i=0; i < points; i ++){
-                if ((i < canvas_points) && (i < shape_points))  {
+                if ((i < shape_points) && (i < shape_points))  {
                     header += '<span class="square" style="background:purple" class="purple"></span>';
                 }
-                if ((i <= canvas_points) && (i >= shape_points)){
+                if ((i <= shape_points) && (i >= shape_points)){
                     header += '<span class="square" style="background:blue" class="blue"></span>';
                 }
-                if ((i >= canvas_points) && (i <= shape_points)){
+                if ((i >= shape_points) && (i <= shape_points)){
                     header += '<span class="square" style="background:red" class="red"></span>';
                 }
              }
 
-             if (canvas_points == shape_points && (canvas_points != 0)){
+             if (shape_points == shape_points && (shape_points != 0)){
                 header += '<input type="submit">';
              }
 
@@ -269,8 +266,6 @@
                 createPresetPoints(num, l);
 
 
-
-
             }
 
             function createPresetPoints(p, l){
@@ -285,6 +280,16 @@
                 preset_list[p][0] = l;
                 shape_list[l] = preset_list[p];
                 slide(l);
+            }
+
+            function readyData(){
+                var count = eval(document.getElementById("shape_count").value) + eval(1);
+
+                var points = "";
+                for (i = 0; i < count; i++){
+                    points += document.getElementById(i + "_points").value + ",";
+                }
+                document.getElementById("points").value = points;
             }
     </script>
     <style>
@@ -489,7 +494,7 @@
 </head>
 <body onload="setCanvas(); slide('0'); trackMass(); shapeChange();">
 
-<form name="form" id="form" action="/test" method="GET">
+<form name="form" id="form" action="/" method="POST">
     <div class="grid">
         <div id="custom_input">
             <span id="header" class="title"><h1>Create a Canvas</h1></span>
@@ -511,9 +516,9 @@
                         </tr>
                         <tr>
                             <td>Shapes </td>
-                            <td><input id="shape_count" type="number" value="0" onchange="shapeChange(this.value); trackMass()"></td>
+                            <td><input name="shape_count" id="shape_count" type="number" value="0" onchange="shapeChange(this.value); trackMass()"></td>
                         </tr>
-                        <div><input type="hidden" name="0_points" id="0_points"></div>
+                        <div><input name="0_points" id="0_points"></div>
                         </table>
                     </div>
                 <div id="0_input" class="points"></div>
@@ -536,7 +541,10 @@
             </div>
         </div>
     </div>
+    <input name="points" id="points">
+    <input onclick="readyData()" type="submit">
 </form>
-<div id="test"></div>
+
+<input type="button" onclick="readyData()">
 </body>
 </html>
