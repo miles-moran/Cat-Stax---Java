@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Canvas extends Shape{
 
+    ArrayList<Integer> output = new ArrayList<>();
     ArrayList<Shape> shapes = new ArrayList<>();
     public Canvas(ArrayList<Point> points){
         this.points = points;
@@ -13,7 +14,6 @@ public class Canvas extends Shape{
         this.maxLength = this.max(this.getX());
         this.maxWidth = this.max(this.getY());
         this.maxHeight = this.max(this.getZ());
-        this.output = this.output();
     }
     public Canvas(){
 
@@ -27,28 +27,22 @@ public class Canvas extends Shape{
         this.shapes = shapes;
     }
 
-    public ArrayList<Boolean> output() {
-        ArrayList<Boolean> output = new ArrayList<>();
-        for (int z = 0; z < (this.max(this.getZ())+1); z++) {
-            for (int y = 0; (y < this.max(this.getY())+1); y++) {
-                for (int x = 0; (x < this.max(this.getX())+1); x++) {
-                    Point compare = new Point(x, y, z);
-                    boolean check = false;
-                    for (Point point : this.points) {
-                        if (point.getList().equals(compare.getList())) {
-                            check = true;
-                            break;
-                        }
-                    }
-                    if (check == true) {
-                        output.add(true);
-                    } else {
-                        output.add(false);
-                    }
-                }
-            }
+    public ArrayList<Integer> ownerOutput() {
+        ArrayList<Integer> output = new ArrayList<>();
+        for(Point point: this.points){
+            output.add(point.getOccupant());
         }
         return output;
+    }
+
+    public Integer dimensionTest(){
+        for(Integer z: this.z){
+            System.out.println(z);
+            if(z > 0){
+                return 3;
+            }
+        }
+        return 2;
     }
 
 

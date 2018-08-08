@@ -20,12 +20,31 @@ public class mainController {
     public String processIndex(@RequestParam String points, Model model){
         Solver solver = new Solver();
         ArrayList<ArrayList<Point>> shape_points = solver.convertRawString(points);
-        ArrayList<Shape> shapes = solver.convertPointsToShapes(shape_points);
-        Canvas canvas = solver.prepareCanvas(shapes);
+        Canvas canvas = new Canvas(shape_points.get(0));
+        Integer dimensions = canvas.dimensionTest();
+        ArrayList<Shape> shapes = solver.convertPointsToShapes(shape_points, dimensions);
+        canvas = solver.prepareCanvas(shapes);
+
         model.addAttribute("shapes", shapes);
         model.addAttribute("canvas", canvas);
+        model.addAttribute("points", points);
 
         return "prepare";
+    }
+    @RequestMapping(value = "solve", method = RequestMethod.GET)
+    public String solve(@RequestParam String points, Model model){
+        Solver solver = new Solver();
+        ArrayList<ArrayList<Point>> shape_points = solver.convertRawString(points);
+        Canvas canvas = new Canvas(shape_points.get(0));
+        Integer dimensions = canvas.dimensionTest();
+        ArrayList<Shape> shapes = solver.convertPointsToShapes(shape_points, dimensions);
+        canvas = solver.prepareCanvas(shapes);
+        solver.solve(canvas);
+        ArrayList<Integer> canvasOutput= canvas.ownerOutput();
+
+        model.addAttribute("canvas", canvasOutput);
+
+        return "solve";
     }
 
 
@@ -33,8 +52,10 @@ public class mainController {
     public String processIndex2(@RequestParam String shape_count, String points, Model model){
         Solver solver = new Solver();
         ArrayList<ArrayList<Point>> shape_points = solver.convertRawString(points);
-        ArrayList<Shape> shapes = solver.convertPointsToShapes(shape_points);
-        Canvas canvas = solver.prepareCanvas(shapes);
+        Canvas canvas = new Canvas(shape_points.get(0));
+        Integer dimensions = canvas.dimensionTest();
+        ArrayList<Shape> shapes = solver.convertPointsToShapes(shape_points, dimensions);
+        canvas = solver.prepareCanvas(shapes);
         solver.solve(canvas);
         ArrayList<Integer> occupants = new ArrayList<>();
         for(Point point: canvas.points){

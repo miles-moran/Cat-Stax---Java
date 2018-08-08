@@ -49,7 +49,7 @@ public class Shape {
         this.output = output();
     }
 
-    public Shape(int id, ArrayList<Point> points) {
+    public Shape(int id, ArrayList<Point> points, Integer dimensions) {
         this.id = id;
         this.points = points;
         this.x = loadList("x");
@@ -58,8 +58,7 @@ public class Shape {
         this.maxLength = this.max(this.getX());
         this.maxWidth = this.max(this.getY());
         this.maxHeight = this.max(this.getZ());
-        this.permutations = children();
-
+        this.permutations = children(dimensions);
     }
 
     public int getId() {
@@ -243,6 +242,41 @@ public class Shape {
         return permutations;
     }
 
+    public ArrayList<ArrayList<Point>> permutations2D() {
+        ArrayList<ArrayList<Point>> permutations = new ArrayList<>();
+        ArrayList<Integer> signs = new ArrayList<>();
+        signs.add(1);
+        signs.add(-1);
+        for (int a = 0; a < 2; a++) {
+            for (int signA : signs) {
+                for (int b = 0; b < 2; b++) {
+                    for (int signB : signs) {
+                        if (a != b) {
+                            ArrayList<Point> permutation = new ArrayList<>();
+                            for (Point point : this.points) {
+                                int x = point.getList().get(a) * signA;
+                                int y = point.getList().get(b) * signB;
+                                Point p = new Point(x, y, 0);
+                                permutation.add(p);
+                            }
+                            Sorter sorter = new Sorter();
+                            permutation = sorter.sort(permutation);
+                            Shape temp = new Shape(permutation);
+                            ArrayList<Point> sorted_points = new ArrayList<>();
+                            sorted_points = temp.positive_points();
+                            temp = new Shape(sorted_points);
+                            temp = new Shape(temp.shrink());
+                            if (sorter.repeats(permutations, temp.points) == false) {
+                                permutations.add(temp.points);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return permutations;
+    }
+
     public ArrayList<String> points() {
         ArrayList<String> points = new ArrayList<>();
         for (Point point : this.points) {
@@ -305,15 +339,13 @@ public class Shape {
         return new_points;
     }
 
-    public void permutations_output(){
-        for (ArrayList<Point> permutation : this.permutations()){
-            Shape out = new Shape(permutation);
-            out.output();
+    public ArrayList<Shape> children(Integer dimensions) {
+        ArrayList<ArrayList<Point>> permutations;
+        if(dimensions == 3){
+            permutations = permutations();
+        } else {
+            permutations = permutations2D();
         }
-    }
-
-    public ArrayList<Shape> children() {
-        ArrayList<ArrayList<Point>> permutations = permutations();
         ArrayList<Shape> children = new ArrayList<>();
         for (ArrayList<Point> permutation : permutations) {
             Shape temp = new Shape(permutation);

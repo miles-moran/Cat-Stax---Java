@@ -70,6 +70,7 @@ public class Solver {
                     return all_positions;
                 }
             } else {
+
                 ArrayList<ArrayList<Point>> locations2 = placer.locations(canvas, canvas.shapes.get(1));
                 for (ArrayList<Point> location2 : locations2) {
                     if (canvas.shapes.size() == 2) {
@@ -299,11 +300,11 @@ public class Solver {
         }
         return true;
     }
-    public ArrayList<Shape> convertPointsToShapes(ArrayList<ArrayList<Point>> points){
+    public ArrayList<Shape> convertPointsToShapes(ArrayList<ArrayList<Point>> points, Integer dimensions){
         ArrayList<Shape> shapes = new ArrayList<>();
         Sorter sorter = new Sorter();
         for(int i=0; i < points.size(); i++){
-            Shape shape = new Shape(i, sorter.sort(points.get(i)));
+            Shape shape = new Shape(i, sorter.sort(points.get(i)), dimensions);
             shapes.add(shape);
         }
         return shapes;
