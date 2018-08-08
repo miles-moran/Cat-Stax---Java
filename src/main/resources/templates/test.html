@@ -14,3 +14,19 @@
 
 </body>
 </html>
+
+<div th:each="shape : ${shapes}">
+    <div th:each="permutation : ${shape.permutations}" th:with="block=${0}">
+        <span th:text="${permutation.output}"></span><span th:text="${permutation.maxHeight}"></span>
+        <span th:text="${permutation.permutation_max_x}"></span><span th:text="${permutation.permutation_max_y}"></span>
+        <div th:each="z : ${#numbers.sequence(0, permutation.maxHeight)}">
+            <div th:each="y : ${#numbers.sequence(0, shape.permutation_max_y)}">
+                <span th:each="x : ${#numbers.sequence(0, shape.permutation_max_x)}">
+                    <span id="test"> x </span>
+                </span>
+            </div>
+            <br>
+        </div>
+        ---
+    </div>
+</div>

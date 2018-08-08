@@ -1,5 +1,7 @@
 package org.launchcode.Cat.Stax.technical;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -15,7 +17,10 @@ public class Shape {
     public ArrayList<Integer> x;
     public ArrayList<Integer> y;
     public ArrayList<Integer> z;
-    private ArrayList<Shape> permutations;
+    public ArrayList<Shape> permutations;
+    public ArrayList<Boolean> output;
+    public Integer permutation_max_x;
+    public Integer permutation_max_y;
 
     public Shape() {
 
@@ -39,6 +44,9 @@ public class Shape {
         this.maxLength = this.max(this.getX());
         this.maxWidth = this.max(this.getY());
         this.maxHeight = this.max(this.getZ());
+        this.permutation_max_x = parent.permutation_max_x;
+        this.permutation_max_y = parent.permutation_max_y;
+        this.output = output();
     }
 
     public Shape(int id, ArrayList<Point> points) {
@@ -51,6 +59,7 @@ public class Shape {
         this.maxWidth = this.max(this.getY());
         this.maxHeight = this.max(this.getZ());
         this.permutations = children();
+
     }
 
     public int getId() {
@@ -169,13 +178,11 @@ public class Shape {
         return dimensionlist;
     }
 
-    public void output() {
-        ArrayList<ArrayList<ArrayList<String>>> output = new ArrayList<>();
+    public ArrayList<Boolean> output() {
+        ArrayList<Boolean> output = new ArrayList<>();
         for (int z = 0; z < (this.max(this.getZ())+1); z++) {
-            ArrayList<ArrayList<String>> slide = new ArrayList<>();
-            for (int y = 0; (y < this.max(this.getY())+1); y++) {
-                ArrayList<String> row = new ArrayList<>();
-                for (int x = 0; (x < this.max(this.getX())+1); x++) {
+            for (int y = 0; (y < this.permutation_max_y + 1); y++) {
+                for (int x = 0; (x < this.permutation_max_x + 1); x++) {
                     Point compare = new Point(x, y, z);
                     boolean check = false;
                     for (Point point : this.points) {
@@ -185,19 +192,14 @@ public class Shape {
                         }
                     }
                     if (check == true) {
-                        row.add("x");
+                        output.add(true);
                     } else {
-                        row.add("y");
+                        output.add(false);
                     }
                 }
-                slide.add(row);
-                System.out.println(row);
             }
-            output.add(slide);
-            System.out.println("");
         }
-        System.out.println("-");
-        System.out.println("");
+        return output;
     }
 
     public ArrayList<ArrayList<Point>> permutations() {
@@ -314,10 +316,56 @@ public class Shape {
         ArrayList<ArrayList<Point>> permutations = permutations();
         ArrayList<Shape> children = new ArrayList<>();
         for (ArrayList<Point> permutation : permutations) {
+            Shape temp = new Shape(permutation);
+            children.add(temp);
+        }
+        this.permutation_max_x = (permutation_max_x(children));
+        this.permutation_max_y = (permutation_max_y(children));
+        children.clear();
+
+        for (ArrayList<Point> permutation : permutations) {
             Shape temp = new Shape(this, permutation);
             children.add(temp);
         }
+
         return children;
+    }
+    public Integer permutation_max_x(ArrayList<Shape> children){
+        ArrayList<Integer> maxes = new ArrayList<>();
+        for(Shape permutation: children){
+            maxes.add(permutation.maxLength);
+        }
+        return max(maxes);
+    }
+    public Integer permutation_max_y(ArrayList<Shape> children){
+        ArrayList<Integer> maxes = new ArrayList<>();
+        for(Shape permutation: children){
+            maxes.add(permutation.maxWidth);
+        }
+        return max(maxes);
+    }
+    public ArrayList<Boolean> getOutput() {
+        return output;
+    }
+
+    public void setOutput(ArrayList<Boolean> output) {
+        this.output = output;
+    }
+
+    public Integer getPermutation_max_x() {
+        return permutation_max_x;
+    }
+
+    public void setPermutation_max_x(Integer permutation_max_x) {
+        this.permutation_max_x = permutation_max_x;
+    }
+
+    public Integer getPermutation_max_y() {
+        return permutation_max_y;
+    }
+
+    public void setPermutation_max_y(Integer permutation_max_y) {
+        this.permutation_max_y = permutation_max_y;
     }
 
 }

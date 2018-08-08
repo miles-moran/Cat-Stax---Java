@@ -16,9 +16,21 @@ public class mainController {
     public String index(Model model){
         return "Bug12";
     }
-
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public String processIndex(@RequestParam String shape_count, String points, Model model){
+    public String processIndex(@RequestParam String points, Model model){
+        Solver solver = new Solver();
+        ArrayList<ArrayList<Point>> shape_points = solver.convertRawString(points);
+        ArrayList<Shape> shapes = solver.convertPointsToShapes(shape_points);
+        Canvas canvas = solver.prepareCanvas(shapes);
+        model.addAttribute("shapes", shapes);
+        model.addAttribute("canvas", canvas);
+
+        return "prepare";
+    }
+
+
+    @RequestMapping(value = "REMNAANT", method = RequestMethod.POST)
+    public String processIndex2(@RequestParam String shape_count, String points, Model model){
         Solver solver = new Solver();
         ArrayList<ArrayList<Point>> shape_points = solver.convertRawString(points);
         ArrayList<Shape> shapes = solver.convertPointsToShapes(shape_points);
