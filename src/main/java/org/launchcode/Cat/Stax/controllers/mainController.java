@@ -39,10 +39,8 @@ public class mainController {
         Integer dimensions = canvas.dimensionTest();
         ArrayList<Shape> shapes = solver.convertPointsToShapes(shape_points, dimensions);
         canvas = solver.prepareCanvas(shapes);
-        solver.solve(canvas);
-        ArrayList<Integer> canvasOutput= canvas.ownerOutput();
-
-        model.addAttribute("canvas", canvasOutput);
+        solver.solve4(canvas);
+        model.addAttribute("canvas", canvas);
 
         return "solve";
     }
@@ -56,7 +54,7 @@ public class mainController {
         Integer dimensions = canvas.dimensionTest();
         ArrayList<Shape> shapes = solver.convertPointsToShapes(shape_points, dimensions);
         canvas = solver.prepareCanvas(shapes);
-        solver.solve(canvas);
+
         ArrayList<Integer> occupants = new ArrayList<>();
         for(Point point: canvas.points){
             occupants.add(point.getOccupant());

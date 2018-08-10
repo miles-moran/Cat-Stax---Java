@@ -5,7 +5,17 @@
     <title>Title</title>
 </head>
 <body>
-<input th:value="${canvas}">
-
+<div th:text="${canvas.ownerOutput()}"></div>
+<div th:each="z : ${#numbers.sequence(0, canvas.maxHeight)}">
+    <div th:each="y : ${#numbers.sequence(0, canvas.maxWidth)}">
+        <span th:each="x : ${#numbers.sequence(0, canvas.maxLength)}">
+            <span th:with="block = ${z} *  ${canvas.maxLength + 1} *  ${canvas.maxWidth + 1} + ${y} * ${canvas.maxLength + 1} + ${x}">
+                <span th:text="${canvas.ownerOutput().get(block)}"></span>
+            </span>
+        </span>
+    </div>
+</div>
+<br>
+</div>
 </body>
 </html>

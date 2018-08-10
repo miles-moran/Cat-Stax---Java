@@ -27,11 +27,25 @@ public class Canvas extends Shape{
         this.shapes = shapes;
     }
 
-    public ArrayList<Integer> ownerOutput() {
-        ArrayList<Integer> output = new ArrayList<>();
-        for(Point point: this.points){
-            output.add(point.getOccupant());
+    public ArrayList<String> ownerOutput() {
+        ArrayList<String> output = new ArrayList<>();
+        for(int z = 0; z < this.maxHeight+1; z++) {
+            for (int y = 0; y < this.maxWidth + 1; y++) {
+                for (int x = 0; x < this.maxLength + 1; x++) {
+                    boolean check = false;
+                    for (Point canvas_point : this.points) {
+                        if (canvas_point.toString().equals(new Point(x, y, z).toString())) {
+                            output.add(canvas_point.getOccupant().toString());
+                            check = true;
+                        }
+                    }
+                    if (check == false) {
+                        output.add("-");
+                    }
+                }
+            }
         }
+        System.out.println(output);
         return output;
     }
 
