@@ -9,7 +9,7 @@ public class Point {
 
     private ArrayList<Integer> list = new ArrayList<>();
 
-    private Integer occupant;
+    private Shape occupant;
 
     public Point(int x, int y, int z){
         this.x = x;
@@ -23,11 +23,12 @@ public class Point {
     public Point(){
 
     }
-    public Integer getOccupant() {
+
+    public Shape getOccupant() {
         return occupant;
     }
 
-    public void setOccupant(Integer occupant) {
+    public void setOccupant(Shape occupant) {
         this.occupant = occupant;
     }
 

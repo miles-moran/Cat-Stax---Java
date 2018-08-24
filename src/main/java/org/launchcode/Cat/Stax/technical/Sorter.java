@@ -6,7 +6,6 @@ public class Sorter {
     public Sorter() {
 
     }
-
     public ArrayList<Point> sort(ArrayList unordered) {
         boolean check = false;
         for (int i = 0; i < (unordered.size() - 1); i++) {

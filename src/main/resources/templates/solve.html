@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style>
+         .square {
+                display: inline-block;
+                width: 1em;
+                height: 1em;
+                background: black;
+                margin: 0em;
+         }
+    </style>
 </head>
 <body>
 <div th:text="${canvas.ownerOutput()}"></div>
@@ -10,12 +19,32 @@
     <div th:each="y : ${#numbers.sequence(0, canvas.maxWidth)}">
         <span th:each="x : ${#numbers.sequence(0, canvas.maxLength)}">
             <span th:with="block = ${z} *  ${canvas.maxLength + 1} *  ${canvas.maxWidth + 1} + ${y} * ${canvas.maxLength + 1} + ${x}">
-                <span th:text="${canvas.ownerOutput().get(block)}"></span>
+                <div class="square" th:style="|background:${canvas.ownerOutput().get(block)}|"></div>
             </span>
         </span>
     </div>
+    <br>
 </div>
 <br>
+<div class="grid">
+    <div th:each="shape : ${canvas.shapes}" class="shape">
+        <div th:each="z : ${#numbers.sequence(0, shape.maxHeight)}">
+            <div th:each="y : ${#numbers.sequence(0, shape.maxWidth)}">
+                <span th:each="x : ${#numbers.sequence(0, shape.maxLength)}">
+                    <span th:with="block = ${z} *  ${shape.maxLength+ 1} *  ${shape.maxWidth + 1} + ${y} * ${shape.maxLength + 1} + ${x}">
+                            <span th:if="${shape.output().get(block)} == true">
+                                 <div class="square" th:style="|background:${shape.color}|"></div>
+                            </span>
+                            <span th:if="${shape.output().get(block)} == false">
+                                 <div class="square" style="background:white"></div>
+                            </span>
+                    </span>
+                </span>
+            </div>
+        </div>
+        <br>
+    </div>
 </div>
+
 </body>
 </html>

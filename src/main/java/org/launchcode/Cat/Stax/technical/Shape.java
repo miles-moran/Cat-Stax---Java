@@ -4,6 +4,7 @@ import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 public class Shape {
     private int id; //IDENTIFIER or SHAPE NUMBER to be incorporated into a database
@@ -21,7 +22,9 @@ public class Shape {
     public ArrayList<Boolean> output;
     public Integer permutation_max_x;
     public Integer permutation_max_y;
-
+    public String color;
+    public ArrayList<String> assembly;
+    public ArrayList<String> presetOutput;
     public Shape() {
 
     }
@@ -34,6 +37,8 @@ public class Shape {
         this.maxLength = this.max(this.getX());
         this.maxWidth = this.max(this.getY());
         this.maxHeight = this.max(this.getZ());
+        this.assembly = assemblyPoints();
+        this.presetOutput = presetOutput();
     }
 
     public Shape(Shape parent, ArrayList<Point> points) {
@@ -194,6 +199,30 @@ public class Shape {
                         output.add(true);
                     } else {
                         output.add(false);
+                    }
+                }
+            }
+        }
+        return output;
+    }
+
+    public ArrayList<String> presetOutput() {
+        ArrayList<String> output = new ArrayList<>();
+        for (int z = 0; z < (this.max(this.getZ())+1); z++) {
+            for (int y = 0; (y < this.maxWidth+ 1); y++) {
+                for (int x = 0; (x < this.maxLength + 1); x++) {
+                    Point compare = new Point(x, y, z);
+                    boolean check = false;
+                    for (Point point : this.points) {
+                        if (point.getList().equals(compare.getList())) {
+                            check = true;
+                            break;
+                        }
+                    }
+                    if (check == true) {
+                        output.add(this.color);
+                    } else {
+                        output.add("white");
                     }
                 }
             }
@@ -398,6 +427,38 @@ public class Shape {
 
     public void setPermutation_max_y(Integer permutation_max_y) {
         this.permutation_max_y = permutation_max_y;
+    }
+
+    public String getColor() {
+        return color;
+    }
+    public void setColor(String color) {
+        this.color = color;
+    }
+    public String createColor(){
+        Random random = new Random();
+        int nextInt = random.nextInt(256*256*256);
+        String colorCode = String.format("#%06x", nextInt);
+        return colorCode;
+    }
+
+    public ArrayList<String> assemblyPoints(){
+        ArrayList<String> assemblyPoints = new ArrayList<>();
+        for(Point point: this.points){
+            String assembly = "(" + point.getX() + "-" + point.getY() + "-" + point.getZ() + ")";
+            assemblyPoints.add(assembly);
+        }
+        System.out.print(assemblyPoints);
+        return assemblyPoints;
+    }
+
+    public Shape catToShape(Cat cat){
+        ArrayList<Point> points = new ArrayList<>();
+        for(CatPoint point: cat.getPoints()){
+            points.add(new Point(point.getX(), point.getY(), point.getZ()));
+        }
+        Shape shape = new Shape(points);
+        return shape;
     }
 
 }

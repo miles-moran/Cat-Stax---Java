@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
 <head>
     <meta charset="UTF-8"/>
     <title></title>
     <link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet"/>
-    <script type="text/javascript">
+    <script type="text/javascript" th:inline="javascript">
         var shape_list = [];
         var preset_list = [];
 
@@ -22,42 +22,45 @@
             setPresets()
         }
         function setPresets(){
-            var shape_n = 0;
-            var shape_x = 2;
-            var shape_y = 2;
-            var shape_z = 1;
-            var shape_points = [];
-            shape_points.push('(0-0-0)');
-            shape_points.push('(1-0-0)');
-            shape_points.push('(1-1-0)');
-            var active_points = shape_points;
-            var shape_color = "yellow";
+            /*<![CDATA[*/
+            var presets = /*[[${presets}]]*/ 'presets';
+            /*]]>*/
 
-            var shape = [shape_n, shape_x, shape_y, shape_z, shape_points, active_points, shape_color];
-            preset_list.push(shape);
+            for (i = 0; i < presets.length; i++){
+                var shape_n = i;
+                var shape_x = presets[i].maxLength;
+                var shape_y = presets[i].maxWidth;
+                var shape_z = presets[i].maxHeight;
+                var shape_points = presets[i].assembly;
+
+                var active_points = shape_points;
+                var shape_color = "yellow";
+
+                var shape = [shape_n, shape_x, shape_y, shape_z, shape_points, active_points, shape_color];
+                preset_list.push(shape);
+            }
         }
-
         function shapeChange(shapeCount){
              var list_length = shape_list.length - 1;
              var shapeCount = shapeCount;
 
+
              if (shapeCount > list_length){
                 for (i = list_length; i < shapeCount; i++){
                     var shape_n = i;
-                    var shape_x = 3;
-                    var shape_y = 3;
+                    var shape_x = 4;
+                    var shape_y = 4;
                     var shape_z = 1;
                     var shape_points = [];
                     var active_points = [];
                     var shape_color = "lime";
-
                     var shape = [shape_n, shape_x, shape_y, shape_z, shape_points, shape_color];
                     shape_list.push(shape);
                 }
              }
 
             var shape_count = document.getElementById("shape_count").value;
-            if (shape_count == 0 ){
+            if (shape_count <= 0 ){
                 document.getElementById("form_0").style.borderBottom = "1px black solid";
             } else {
                 document.getElementById("form_0").style.borderBottom = "";
@@ -72,16 +75,16 @@
                 var j = i + 1;
                 var shape = shape_list[j];
                 var shape_title = '<span class="title"><h2> Create Shape ' + j + '</h2></span>';
-                var shape_x = '<div class="shape" ><div class="input"><table><tr><td>X-axis</td><td><input id=' + j + "_x" + ' type="number" value="' + shape[1] + '" onchange="slide(' + j + '); trackMass()"></div></td></tr>';
+                var shape_x = '<div class="shape"><div class="input"><table><tr><td>X-axis</td><td><input id=' + j + "_x" + ' type="number" value="' + shape[1] + '" onchange="slide(' + j + '); trackMass()"></div></td></tr>';
                 var shape_y = '<tr><td>Y-axis</td><td><input id=' + j + "_y" + ' type="number" value="' + shape[2] + '" onchange="slide(' + j + '); trackMass()"></div></td></tr>';
-                var shape_z = '<tr><td>Z-axis</td><td><input id=' + j + "_z" + ' type="number" value="' + shape[3] + '" onchange="slide(' + j + '); trackMass()"></div></td></tr></table></div>';
+                var shape_z = '<tr><td>Z-axis</td><td><input id=' + j + "_z" + ' type="number" value="' + shape[3] + '" onchange="slide(' + j + '); trackMass()"></td></tr></table>';
+                var shape_add = '<table><tr><input class="add" id="' + j + '" type="button" value="Add Preset" onClick="confirmAdd(' + j + ')"></tr></table></div>';
                 var shape_points = '<input type="hidden" name="' + j + '_points" id="' + j + '_points">';
-                var shape_input = '<div class="points" id="' + j + '_input"></div>';
+                var shape_input = '<div class="points" id="d_' + j + '" ondrop="drop(event)" ondragover="allowDrop(event)"></div>';
                 var shape_form = '<div id="shape_' + j + '">';
-                shape_form += shape_title + shape_x + shape_y + shape_z + shape_input + shape_points;
+                shape_form += shape_title + shape_x + shape_y + shape_z + shape_add + shape_input + shape_points;
                 shape_form += '</div></div>';
                 document.getElementById("shape_forms").innerHTML += shape_form;
-
             }
             slide(0);
             for (i = 0; i < shapeCount; i ++){
@@ -91,7 +94,7 @@
         }
 
         function slide(shape){
-            document.getElementById(shape + "_input").innerHTML = "";
+            document.getElementById("d_" + shape).innerHTML = "";
             shape_list[shape][5] = [];
             var z = document.getElementById(shape + "_z").value;
             shape_list[shape][3] = z;
@@ -104,8 +107,7 @@
                 slide = '<div id="slide">' + slide + '</div>';
                 slides += slide;
             }
-            slides += '</div><div id="d_' + shape + '" class="shape_drop" ondrop="drop(event)" ondragover="allowDrop(event)"></div>'
-            document.getElementById(shape + "_input").innerHTML += slides;
+            document.getElementById("d_" + shape).innerHTML += slides;
 
             document.getElementById(shape + "_points").value = shape_list[shape][5];
 
@@ -174,53 +176,52 @@
             document.getElementById(shape + "_points").value = shape_list[shape][5];
         }
 
-        function trackMass(){}
-
-        function trackMass2(){
-             document.getElementById("header").innerHTML = "";
-             var header = '<span id="header"><h1>Create a Canvas</h1>';
-
+        function trackMass(){
+             document.getElementById("massCounter").innerHTML = "";
              var shape_count = document.getElementById("shape_count").value;
-             var shape_points = shape_list[0][5];
+             var canvas_points = shape_list[0][5].length;
 
              var shape_points = 0;
-             for (i=1; i <= shape_count; i++){
-                shape_points += shape_list[i][5];
+
+             for (i=0; i < shape_count; i++){
+                shape_points += shape_list[i+1][5].length;
              }
+
              var points;
-             if (shape_points > shape_points){
-                points = shape_points;
+             if (canvas_points > shape_points){
+                points = canvas_points;
              } else {
                 points = shape_points;
              }
 
-             if (points == 0){
-                    header += '<div id="logo"><div class="square" id="L1" style="background:blue"></div>';
-                    //header += '<div class="square" class="top" id="L2" style="background:orange"></div>';
-                    //header += '<div class="square" class="top" id="L3" style="background:orange"></div>';
-                    //header += '<div class="square" id="L4" style="background:orange"></div>';
-
-             }
+             var column_style = "grid-template-columns:";
+             var shape_counter = "";
 
              for (i=0; i < points; i ++){
-                if ((i < shape_points) && (i < shape_points))  {
-                    header += '<span class="square" style="background:purple" class="purple"></span>';
+                column_style += " 1fr";
+                if ((i < canvas_points) && (i < shape_points))  {
+                    shape_counter += '<span class="mass" style="background:purple" class="purple"></span>';
                 }
-                if ((i <= shape_points) && (i >= shape_points)){
-                    header += '<span class="square" style="background:blue" class="blue"></span>';
+                if ((i <= canvas_points) && (i >= shape_points)){
+                    shape_counter += '<span class="mass" style="background:blue" class="blue"></span>';
                 }
-                if ((i >= shape_points) && (i <= shape_points)){
-                    header += '<span class="square" style="background:red" class="red"></span>';
+                if ((i >= canvas_points) && (i <= shape_points)){
+                    shape_counter += '<span class="mass" style="background:red" class="red"></span>';
+                }
+
+                if (canvas_points != shape_points){
+                    document.getElementById("submit").disabled = true;
+                } else {
+                    document.getElementById("submit").disabled = false;
                 }
              }
-
-             if (shape_points == shape_points && (shape_points != 0)){
-                header += '<input type="submit">';
+             column_style += ";"
+             document.getElementById("massCounter").style = column_style;
+             if (points == 0){
+                document.getElementById("massCounter").innerHTML = '<span class="mass" style="background:blue" class="blue"></span>';
+             } else {
+             document.getElementById("massCounter").innerHTML = shape_counter;
              }
-
-             header += '</span>';
-
-             document.getElementById("header").innerHTML = header;
             }
 
             function dragStart(event) {
@@ -240,7 +241,8 @@
                 var data = event.dataTransfer.getData("Shape");
                 event.target.appendChild(document.getElementById(data));
                 debugger
-                applyPreset(event.target.id, data, event);
+                applyPreset(event.currentTarget.id, data, event);
+                trackMass();
             }
 
             function applyPreset(landing, preset, event){
@@ -257,15 +259,7 @@
                     }
                 }
                 var num = p-1;
-                //var origin = 'preset_' + p + '_container';
-                //var origin_id = document.getElementById(origin)
-                //origin_id.appendChild(data)
-
-
-
                 createPresetPoints(num, l);
-
-
             }
 
             function createPresetPoints(p, l){
@@ -284,17 +278,100 @@
 
             function readyData(){
                 var count = eval(document.getElementById("shape_count").value) + eval(1);
-
                 var points = "";
                 for (i = 0; i < count; i++){
                     points += document.getElementById(i + "_points").value + ",";
                 }
-                document.getElementById("points").value = points;
+                document.getElementById("points").value += points;
             }
+
+            function fillCanvas(){
+                z = document.getElementById("0_z").value;
+                y = document.getElementById("0_y").value;
+                x = document.getElementById("0_x").value;
+                shape_list[0][4] = [];
+                shape_list[0][5] = [];
+                document.getElementById("0_points").value = "";
+                for(i = 0; i < z; i ++){
+                    for(j = 0; j < y; j++){
+                        for(k = 0; k < x; k++){
+                            var button = "[0](" + k + "-" + j + "-" + i + ")";
+                            shape_list[0][4].push(button);
+                            shape_list[0][5].push(button);
+                            document.getElementById("0_points").value += button;
+                            document.getElementById(button).checked = true;
+                        }
+                    }
+                }
+                trackMass();
+            }
+
+            function confirmAdd(shape_num){
+                if (confirm('Are you sure you would like to add Shape ' + shape_num + ' to presets?')) {
+                    shapeAdd(shape_num);
+                } else {}
+
+            }
+
+            function shapeAdd(shape_num){
+                var add = document.getElementById(shape_num + "_points").value + ",";
+                document.getElementById("add").value += add;
+            }
+
+            function cloneSlide(){
+                var canvas = shape_list[0];
+
+                var canvas_x = document.getElementById("0_x").value;
+                var canvas_y = document.getElementById("0_y").value;
+                var canvas_z = document.getElementById("0_z").value;
+
+                if (canvas_z > 1){
+                    for(z = 1; z < canvas_z; z++){
+                        for(y = 0; y < canvas_y; y++){
+                            for(x = 0; x < canvas_x; x++){
+                                var cord = "[0]" + "(" + x + "-" + y + "-0)";
+                                var alter_cord = "[0]" + "(" + x + "-" + y + "-" + z + ")";
+                                document.getElementById(alter_cord).checked = document.getElementById(cord).checked;
+                            }
+                        }
+                    }
+                }
+                canvas[4] = [];
+                canvas[5] = [];
+                document.getElementById("0_points").value = "";
+                for(z = 0; z < canvas_z; z++){
+                    for(y = 0; y < canvas_y; y++){
+                        for(x = 0; x < canvas_x; x++){
+                            var cord = "[0]" + "(" + x + "-" + y + "-" + z + ")";
+                            if (document.getElementById(cord).checked == true){
+                                canvas[4].push(cord);
+                                canvas[5].push(cord);
+                                document.getElementById("0_points").value += cord;
+                            }
+                        }
+                    }
+                }
+                trackMass();
+            }
+
+            function rawEntry(){
+                var rawEntry = prompt("Raw Data Entry: ");
+                if (rawEntry == null || rawEntry == "") {
+
+                } else {
+                    document.getElementById("points").value = rawEntry;
+                    document.getElementById("submit").disabled = false;
+                }
+                document.myForm.submit();
+            }
+
+
+
     </script>
     <style>
         body {
             font-family: 'Muli', sans-serif;
+            margin-top: -.00em;
         }
         input[type="number"] {
             width: 2.5em;
@@ -316,14 +393,7 @@
             display: inline-block;
 
         }
-        .square {
-                display: inline-block;
-                width: 1em;
-                height: 1em;
-                margin: 0em;
-                margin-left: 1em;
 
-        }
         input[type=number]::-webkit-inner-spin-button,
         input[type=number]::-webkit-outer-spin-button {
 
@@ -428,28 +498,11 @@
         }
         .grid {
             display: grid;
-            grid-template-columns: 79.5em 46em;
-        }
-        #preset {
-            border: 1px black solid;
-            height: 45em;
-            width: 7.85em;
-            position: fixed;
-            left: 87em;
-            background-color: gray;
+            grid-template-columns: 80 20;
         }
         #header {
             background-color: lightblue;
-        }
-        #preset_container {
-            border: 1px solid black;
-            margin: 1px;
-            height: 44.8em;
-            width: 7.6em;
-            background-color: white;
-        }
-        #preset_header {
-            margin-left: 3.35em;
+            margin-top: 1em;
         }
         .droptarget {
             float: left;
@@ -460,10 +513,7 @@
             border: 1px solid #aaaaaa;
             margin-top: 5.2px;
         }
-        #preset_1 {
-            background-image: url("https://i.imgur.com/W75E69m.jpg");
-            background-size: 100% 100%;
-
+        .preset {
             width: 89px;
             height: 89px;
         }
@@ -489,25 +539,80 @@
         .droptarget:hover{
             cursor: pointer;
         }
+        #fill {
+            width: 2.8em;
+        }
+        #clone {
+            width: 4em;
+        }
+        .add {
+            width: 6.8em;
+        }
+        .square {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            background: black;
+            margin: 0em;
+         }
+        #preset_container {
+            border: black solid 1px;
+            width: 16em;
+            height: 46em;
+            overflow: auto;
+            position: fixed;
+            right: 0em;
+            margin-top: 1em;
+
+            background-color: white;
+        }
+        #submit_section {
+            border-bottom: black solid 1px;
+            padding-bottom: .2em;
+        }
+        #raw {
+            margin-left: .4em;
+            width: 2.8em;
+        }
+        #submit {
+            width: 4em;
+            margin-left: .2em;
+        }
+        #massCounter {
+            display: grid;
+            grid-template-columns: 1fr;
+            width: 100%;
+            position: fixed;
+            border-bottom: 1px solid black;
+
+        }
+        .mass {
+            display: inline-block;
+            width: auto;
+            height: 1em;
+            background: black;
+            margin: 0em;
+        }
 
     </style>
 </head>
-<body onload="setCanvas(); slide('0'); trackMass(); shapeChange();">
+<body onload="setCanvas(); slide('0'); trackMass(); shapeChange(0)">
 
-<form name="form" id="form" action="/" method="POST">
+<form name="myForm" id="myForm" method="POST" action="/prepare">
+    <span id="massCounter"></span>
     <div class="grid">
         <div id="custom_input">
-            <span id="header" class="title"><h1>Create a Canvas</h1></span>
+            <div id="header" class="title"><h1>Create a Canvas</h1></div>
             <div id="form_0"  class="shape">
                 <div class="input">
                     <table>
                         <tr>
                             <td>X-axis </td>
-                            <td><input id="0_x" type="number" value="3" onchange="slide('0'); trackMass()"></td>
+                            <td><input id="0_x" type="number" value="5" onchange="slide('0'); trackMass()"></td>
                         </tr>
                         <tr>
                             <td>Y-axis </td>
-                            <td><input id="0_y" type="number" value="3" onchange="slide('0'); trackMass()"></td>
+                            <td><input id="0_y" type="number" value="5" onchange="slide('0'); trackMass()"></td>
 
                         </tr>
                         <tr>
@@ -518,31 +623,39 @@
                             <td>Shapes </td>
                             <td><input name="shape_count" id="shape_count" type="number" value="0" onchange="shapeChange(this.value); trackMass()"></td>
                         </tr>
+                        <tr>
+                            <td><input id="clone" type="button" value="Clone" onclick="cloneSlide()"></td>
+                            <td><input id="fill" value="Fill" type="button" onclick="fillCanvas()"></td>
+                        </tr>
                         <div><input type="hidden" name="0_points" id="0_points"></div>
                         </table>
                     </div>
-                <div id="0_input" class="points"></div>
+                <div id="d_0" ondrop="drop(event)" ondragover="allowDrop(event)" class="points"></div>
             </div>
 
             <div id="shape_forms"></div>
         </div>
-        <div id="preset">
-            <div id="preset_container">
-                    <div id="presets">
-                            <div id="preset_1_container" class="droptarget" ondrop="drop(event)" ondragover="allowDrop(event)">
-                                <div id="preset_1" ondragstart="dragStart(event)" ondrag="dragging(event)" draggable="true"></div>
-                            </div>
-                            <div class="droptarget" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-                            <div class="droptarget" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-                            <div class="droptarget" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-                            <div class="droptarget" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-                            <div class="droptarget" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        <div id="preset_container">
+            <div th:each="shape_num : ${#numbers.sequence(0, presets.size() - 1)}">
+                <div class="droptarget" ondrop="drop(event)" ondragover="allowDrop(event)" >
+                    <div class="preset" th:id="'preset_' + ${shape_num + 1}" ondragstart="dragStart(event)" ondrag="dragging(event)" draggable="true">
+                        <div th:each="y : ${#numbers.sequence(0, presets.get(shape_num).maxWidth)}">
+                            <span th:each="x : ${#numbers.sequence(0, presets.get(shape_num).maxLength)}">
+                                <span th:with="block = ${y} * ${presets.get(shape_num).maxLength + 1} + ${x}">
+                                    <div class="square" th:style="|background:${presets.get(shape_num).presetOutput.get(block)}|"></div>
+                                </span>
+                            </span>
+                        </div>
                     </div>
+                </div>
             </div>
         </div>
     </div>
-    <input type="hidden" name="points" id="points">
-    <input onclick="readyData()" type="submit">
+    <input name="points" id="points" type="hidden">
+    <input type="hidden" id="add" name="add" value="">
+    <div id="submit_section">
+        <span><input id="submit" onclick="readyData()" type="submit" value="Solve" disabled="true"><input id="raw" type="button" value="RI" onclick="rawEntry()"></span>
+    </div>
 </form>
 
 </body>

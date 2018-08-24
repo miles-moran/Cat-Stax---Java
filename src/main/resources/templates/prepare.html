@@ -18,30 +18,45 @@
                 margin: 0em;
                 background: lightgrey;
             }
+        .grid {
+            display: grid;
+            grid-template-columns: auto auto auto auto auto;
+        }
+        .shape {
+            padding: .5em;
+        }
+
+
     </style>
     <script>
 
     </script>
 </head>
 <body>
-
-<div th:each="shape : ${shapes}">
-    <div th:each="permutation : ${shape.permutations}" th:with="block=${0}">
-        <div th:each="z : ${#numbers.sequence(0, permutation.maxHeight)}">
-            <div th:each="y : ${#numbers.sequence(0, shape.permutation_max_y)}">
-                <span th:each="x : ${#numbers.sequence(0, shape.permutation_max_x)}">
-                    <span th:with="block = ${z} *  ${permutation.permutation_max_x + 1} *  ${permutation.permutation_max_y + 1} + ${y} * ${permutation.permutation_max_x + 1} + ${x}">
-                        <span th:if="${permutation.output.get(block)} == true"><div class="square"></div></span>
-                        <span th:if="${permutation.output.get(block)} == false"><div class="null"></div></span>
+<div>
+    <span>Difficulty Level: </span><span th:text="${difficulty}"></span>
+</div>
+<div>
+    <span>Raw Data </span><textarea th:text="${points}"></textarea>
+</div>
+<div class="grid">
+    <div th:each="shape : ${shapes}" class="shape">
+        <div th:each="permutation : ${shape.permutations}" th:with="block=${0}">
+            <div th:each="z : ${#numbers.sequence(0, permutation.maxHeight)}">
+                <div th:each="y : ${#numbers.sequence(0, shape.permutation_max_y)}">
+                    <span th:each="x : ${#numbers.sequence(0, shape.permutation_max_x)}">
+                        <span th:with="block = ${z} *  ${permutation.permutation_max_x + 1} *  ${permutation.permutation_max_y + 1} + ${y} * ${permutation.permutation_max_x + 1} + ${x}">
+                            <span th:if="${permutation.output.get(block)} == true"><div class="square"></div></span>
+                            <span th:if="${permutation.output.get(block)} == false"><div class="null"></div></span>
+                        </span>
                     </span>
-                </span>
+                </div>
+                <br>
             </div>
             <br>
         </div>
-        <hr>
     </div>
 </div>
-
 <form action="solve" method="get">
     <input name="points" type="hidden" th:value="${points}">
     <input type="submit">

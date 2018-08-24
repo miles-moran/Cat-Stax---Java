@@ -35,17 +35,20 @@ public class Canvas extends Shape{
                     boolean check = false;
                     for (Point canvas_point : this.points) {
                         if (canvas_point.toString().equals(new Point(x, y, z).toString())) {
-                            output.add(canvas_point.getOccupant().toString());
+                            if(canvas_point.getOccupant() != null) {
+                                output.add(canvas_point.getOccupant().color);
+                            } else {
+                                output.add("black");
+                            }
                             check = true;
                         }
                     }
                     if (check == false) {
-                        output.add("-");
+                        output.add("#E8E8E8");
                     }
                 }
             }
         }
-        System.out.println(output);
         return output;
     }
 
@@ -59,6 +62,23 @@ public class Canvas extends Shape{
         return 2;
     }
 
+    public ArrayList<Shape> sortShapesByMass(ArrayList<Shape> unordered) {
+        boolean check = false;
+        for (int i = 0; i < (unordered.size() - 1); i++) {
+            Shape shape1 = unordered.get(i);
+            Shape shape2 = unordered.get(i + 1);
+            if (shape1.points.size() < shape2.points.size()) {
+                Shape placeholder = shape1;
+                unordered.set(i, shape2);
+                unordered.set(i + 1, placeholder);
+                check = true;
+            }
+            if (check == true) {
+                sortShapesByMass(unordered);
+            }
 
+        }
+        return unordered;
+    }
 
 }
