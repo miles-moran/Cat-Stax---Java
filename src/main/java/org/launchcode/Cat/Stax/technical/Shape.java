@@ -448,7 +448,6 @@ public class Shape {
             String assembly = "(" + point.getX() + "-" + point.getY() + "-" + point.getZ() + ")";
             assemblyPoints.add(assembly);
         }
-        System.out.print(assemblyPoints);
         return assemblyPoints;
     }
 

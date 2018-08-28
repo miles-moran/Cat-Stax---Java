@@ -2,7 +2,8 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org/">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Preparing Puzzle</title>
+    <link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet"/>
     <style>
         .square {
                 display: inline-block;
@@ -20,28 +21,116 @@
             }
         .grid {
             display: grid;
-            grid-template-columns: auto auto auto auto auto;
+            grid-template-columns: auto auto auto auto auto auto;
+        }
+        body {
+            font-family: 'Muli', sans-serif;
+        }
+        #raw {
+            float: right;
+        }
+        #data {
+            border-bottom: 1px solid black;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        #copy {
+
         }
         .shape {
-            padding: .5em;
+            border-right: 1px solid black;
         }
+        .permutation {
+            border-bottom: 1px solid black;
+            padding-left: 1em;
+        }
+        .shape:nth-child(6){
+            border-right: none;
+        }
+        .shape:nth-child(7){
+            border-top: 1px solid black;
+        }
+        .shape:nth-child(8){
+            border-top: 1px solid black;
+        }
+        .shape:nth-child(9){
+            border-top: 1px solid black;
+        }
+        .shape:nth-child(10){
+            border-top: 1px solid black;
+        }
+        .shape:nth-child(11){
+            border-top: 1px solid black;
+        }
+        .shape:nth-child(12){
+            border-top: 1px solid black;
+            border-right: none;
+        }
+        .shape:last-child {
+            border-right: none;
+        }
+        .permutation:last-child {
+            border-bottom: none;
+        }
+        .shape_label {
+            text-align: center;
+            border-bottom: 1px solid black;
+            background-color: lightblue;
+        }
+        #textData {
+            display: grid;
+            grid-template-columns: 3.5em auto;
+        }
+        #submit {
+            margin-top: .25em;
+            height: 2.6em;
+        }
+        .shape_label {
 
-
+        }
     </style>
     <script>
+        function copyData(){
+              var copy = document.getElementById("raw");
+              copy.select();
+              document.execCommand("copy");
+        }
+        function styleBorder(){
+            document.getElementById("shape_1").style.borderRight = "0px black solid";
+            document.getElementById("shape_12").style.borderRight = "0px black solid";
+        }
+        function getRandomColor() {
+              var letters = '0123456789ABCDEF';
+              var color = '#';
+              for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+              }
+              return color;
+        }
 
     </script>
 </head>
 <body>
-<div>
-    <span>Difficulty Level: </span><span th:text="${difficulty}"></span>
-</div>
-<div>
-    <span>Raw Data </span><textarea th:text="${points}"></textarea>
+<div id="data">
+    <div id="textData">
+        <div>
+            <form action="solve" method="get" id="solve">
+                <input name="points" type="hidden" th:value="${points}">
+                <input type="submit" id="submit" value="Solve">
+            </form>
+        </div>
+        <div>
+            <span><strong>Difficulty Level: </strong>Hard</span>
+            <div><strong>Complexity: </strong><span th:text="${difficulty}"></span></div>
+        </div>
+    </div>
+    <div><textarea id="raw" th:text="${points}" onclick="copyData()"></textarea></div>
 </div>
 <div class="grid">
-    <div th:each="shape : ${shapes}" class="shape">
-        <div th:each="permutation : ${shape.permutations}" th:with="block=${0}">
+    <div th:each="shape : ${shapes}" class="shape" th:id="'shape_' + ${shape.id}">
+        <div th:text="'Shape ' +  ${shape.id}" class="shape_label"></div>
+        <div th:each="permutation : ${shape.permutations}" th:with="block=${0}" class="permutation">
+            <br>
             <div th:each="z : ${#numbers.sequence(0, permutation.maxHeight)}">
                 <div th:each="y : ${#numbers.sequence(0, shape.permutation_max_y)}">
                     <span th:each="x : ${#numbers.sequence(0, shape.permutation_max_x)}">
@@ -53,20 +142,9 @@
                 </div>
                 <br>
             </div>
-            <br>
         </div>
     </div>
 </div>
-<form action="solve" method="get">
-    <input name="points" type="hidden" th:value="${points}">
-    <input type="submit">
-</form>
-
-
-
-
-
-
 
 </body>
 </html>

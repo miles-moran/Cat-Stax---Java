@@ -101,13 +101,16 @@ public class mainController {
         canvas = solver.prepareCanvas(shapes);
 
         long startTime = System.currentTimeMillis();
-        solver.solve4DIAGNOSTIC(canvas);
+        solver.solve6DIAGNOSTIC(canvas);
         long stopTime = System.currentTimeMillis();
 
-        System.out.println("SOLVING: Elapsed time was " + (stopTime - startTime) + " miliseconds.");
+        long timeElapsed = (stopTime - startTime);
+
+        System.out.println("SOLVING: Elapsed time was " +  timeElapsed + " miliseconds.");
 
         model.addAttribute("raw", points);
         model.addAttribute("canvas", canvas);
+        model.addAttribute("elapsed",  timeElapsed);
 
         return "solve";
     }

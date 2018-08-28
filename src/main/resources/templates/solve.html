@@ -2,7 +2,8 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org/">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Solved Puzzle</title>
+    <link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet"/>
     <style>
          .square {
                 display: inline-block;
@@ -11,21 +12,46 @@
                 background: black;
                 margin: 0em;
          }
+         body {
+            font-family: 'Muli', sans-serif;
+         }
+         #container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+         }
+         #column2 {
+            text-align: center;
+            border: 1px solid black;
+         }
+         #title {
+            border-bottom: 1px solid black;
+            background-color: lightblue;
+            padding: 1em;
+         }
+         #canvas {
+            border-bottom: 1px solid black;
+         }
     </style>
 </head>
 <body>
-<div th:text="${canvas.ownerOutput()}"></div>
-<div th:each="z : ${#numbers.sequence(0, canvas.maxHeight)}">
-    <div th:each="y : ${#numbers.sequence(0, canvas.maxWidth)}">
-        <span th:each="x : ${#numbers.sequence(0, canvas.maxLength)}">
-            <span th:with="block = ${z} *  ${canvas.maxLength + 1} *  ${canvas.maxWidth + 1} + ${y} * ${canvas.maxLength + 1} + ${x}">
-                <div class="square" th:style="|background:${canvas.ownerOutput().get(block)}|"></div>
-            </span>
-        </span>
-    </div>
-    <br>
-</div>
-<br>
+<div id="container">
+    <div id="column1"></div>
+    <div id="column2">
+        <div id="title"><span id="time"><span><strong>Time Elapsed: </strong></span><span th:text="${elapsed}"></span><span> milliseconds</span></span></div>
+            <div id="canvas">
+                <div th:each="z : ${#numbers.sequence(0, canvas.maxHeight)}">
+                    <br>
+                    <div th:each="y : ${#numbers.sequence(0, canvas.maxWidth)}">
+                        <span th:each="x : ${#numbers.sequence(0, canvas.maxLength)}">
+                            <span th:with="block = ${z} *  ${canvas.maxLength + 1} *  ${canvas.maxWidth + 1} + ${y} * ${canvas.maxLength + 1} + ${x}">
+                                <div class="square" th:style="|background:${canvas.ownerOutput().get(block)}|"></div>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <br><br>
 <div class="grid">
     <div th:each="shape : ${canvas.shapes}" class="shape">
         <div th:each="z : ${#numbers.sequence(0, shape.maxHeight)}">
@@ -45,6 +71,8 @@
         <br>
     </div>
 </div>
-
+    </div>
+    <div id="column3"></div>
+</div>
 </body>
 </html>

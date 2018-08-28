@@ -53,8 +53,7 @@ public class Canvas extends Shape{
     }
 
     public Integer dimensionTest(){
-        for(Integer z: this.z){
-            System.out.println(z);
+        for(Integer z: this.z){ ;
             if(z > 0){
                 return 3;
             }
